@@ -5,10 +5,11 @@ public class EnemySpawnerScript : MonoBehaviour
 {
 
     public GameObject fallingObjectPrefab;
+    public float spawnrate = 5f;
 
     void Start()
     {
-        InvokeRepeating("SpawnFallingObject", 1f, 2f);
+        InvokeRepeating("SpawnFallingObject", 1f, spawnrate);
     }
 
     // Update is called once per frame
