@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CommandLeft : MonoBehaviour
+public class CommandLeft : ICommand
 {
     private Player2 player;
     private Vector3 previousPosition;
