@@ -18,6 +18,20 @@ public class ScoreManager : MonoBehaviour
     public TextMeshProUGUI targetText;
     public TextMeshProUGUI remainingText; // shows remaining for current level
     public TextMeshProUGUI levelText;
+    public TextMeshProUGUI livesText;     // NEW: shows current lives
+
+    [Header("Falling object / Spawner tuning")]
+    public float baseFallLifetime = 5f;             // base destroy delay for landed objects
+    public float lifetimeDecreasePerLevel = 0.3f;   // reduce lifetime each level
+    public float minFallLifetime = 1.0f;
+
+    public float baseSpawnRate = 5f;                // base spawn interval
+    public float spawnRateDecreasePerLevel = 0.5f;  // reduce interval each level (faster spawns)
+    public float minSpawnRate = 0.6f;
+
+    [Header("Lives")]
+    public int initialLives = 5;        // lives at level 0
+    public int extraLivesPerLevel = 2;  // additional lives per level
 
     [Header("UI Panels")]
     public GameObject gameUI;
@@ -34,6 +48,7 @@ public class ScoreManager : MonoBehaviour
     int levelScore;   // per-level score (reset at level start)
     int currentLevel;
     int targetScore;
+    int currentLives;
 
     void Awake()
     {
@@ -50,8 +65,15 @@ public class ScoreManager : MonoBehaviour
         currentLevel = Mathf.Max(0, startLevel);
         SetTargetForLevel(currentLevel);
         ResetLevelScore();
-        if (gameOverUI != null) gameOverUI.SetActive(false);
+
+        // set lives for this level
+        currentLives = ComputeLivesForLevel(currentLevel);
         UpdateScoreUI();
+
+        if (gameOverUI != null) gameOverUI.SetActive(false);
+
+        // update spawner with the current spawn rate
+        UpdateSpawnerRate();
     }
 
     void SetTargetForLevel(int level)
@@ -83,6 +105,11 @@ public class ScoreManager : MonoBehaviour
     {
         levelScore = 0;
         UpdateScoreUI();
+    }
+
+    int ComputeLivesForLevel(int level)
+    {
+        return Mathf.Max(0, initialLives + level * extraLivesPerLevel);
     }
 
     // Call to explicitly reset entire run (total + level)
@@ -117,6 +144,9 @@ public class ScoreManager : MonoBehaviour
 
         if (levelText != null)
             levelText.text = $"Level: {currentLevel}";
+
+        if (livesText != null)
+            livesText.text = $"Lives: {currentLives}";
     }
 
     void TriggerGameOver()
@@ -151,6 +181,9 @@ public class ScoreManager : MonoBehaviour
     {
         currentLevel++;
         SetTargetForLevel(currentLevel);
+
+        // give additional lives for the new level
+        currentLives = ComputeLivesForLevel(currentLevel);
         ResetLevelScore();
 
         // update highest level when advancing
@@ -165,6 +198,9 @@ public class ScoreManager : MonoBehaviour
         PlayerPrefs.SetInt(LastLevelKey, currentLevel);
         PlayerPrefs.Save();
 
+        // update spawner rate for new level
+        UpdateSpawnerRate();
+
         if (gameOverUI != null) gameOverUI.SetActive(false);
         if (gameUI != null) gameUI.SetActive(true);
         Time.timeScale = 1f;
@@ -176,6 +212,7 @@ public class ScoreManager : MonoBehaviour
         currentLevel = 0;
         SetTargetForLevel(currentLevel);
         ResetLevelScore();
+        currentLives = ComputeLivesForLevel(currentLevel);
 
         if (menuManger != null)
         {
@@ -186,6 +223,7 @@ public class ScoreManager : MonoBehaviour
         if (gameOverUI != null) gameOverUI.SetActive(false);
         if (gameUI != null) gameUI.SetActive(false);
         Time.timeScale = 1f;
+        UpdateScoreUI();
     }
 
     // Quit application (works in build; stops play mode in editor)
@@ -205,9 +243,53 @@ public class ScoreManager : MonoBehaviour
         SetTargetForLevel(currentLevel);
         if (resetTotal) totalScore = 0;
         ResetLevelScore();
+
+        // set lives appropriately for the restarted level
+        currentLives = ComputeLivesForLevel(currentLevel);
+
         if (gameOverUI != null) gameOverUI.SetActive(false);
         if (gameUI != null) gameUI.SetActive(true);
+
+        // update spawner rate for restarted level
+        UpdateSpawnerRate();
+
         Time.timeScale = 1f;
+        UpdateScoreUI();
+    }
+
+    // Called by falling objects when they self-destruct after landing
+    public void ReduceLife(int amount)
+    {
+        currentLives -= amount;
+        currentLives = Mathf.Max(0, currentLives);
+        UpdateScoreUI();
+
+        if (currentLives <= 0)
+        {
+            // treat running out of lives as game over
+            TriggerGameOver();
+        }
+    }
+
+    // Spawn/fall tuning helpers
+    public float GetFallLifetime()
+    {
+        float lifetime = baseFallLifetime - currentLevel * lifetimeDecreasePerLevel;
+        return Mathf.Max(minFallLifetime, lifetime);
+    }
+
+    public float GetSpawnRate()
+    {
+        float rate = baseSpawnRate - currentLevel * spawnRateDecreasePerLevel;
+        return Mathf.Max(minSpawnRate, rate);
+    }
+
+    void UpdateSpawnerRate()
+    {
+        // find spawner and update its spawn rate
+        var spawner = Object.FindAnyObjectByType<EnemySpawnerScript>();
+        if (spawner != null)
+            spawner.SetSpawnRate(GetSpawnRate());
     }
 
     // Helpers
