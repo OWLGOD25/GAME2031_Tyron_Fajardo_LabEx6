@@ -5,6 +5,9 @@ public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance { get; private set; }
 
+    [Header("References")]
+    public MenuManger menuManger; // assign the MenuManger in the Inspector
+
     [Header("Levels / Targets")]
     public int[] levelTargets = new int[] { 5, 10, 20 };
     public int extraPerLevel = 10;
@@ -13,8 +16,8 @@ public class ScoreManager : MonoBehaviour
     [Header("Score UI")]
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI targetText;
-    public TextMeshProUGUI remainingText; // NEW: shows how much you still need
-    public TextMeshProUGUI levelText;     // NEW: shows current level
+    public TextMeshProUGUI remainingText;
+    public TextMeshProUGUI levelText;
 
     [Header("UI Panels")]
     public GameObject gameUI;
@@ -25,6 +28,7 @@ public class ScoreManager : MonoBehaviour
 
     const string HighScoreKey = "HighScore";
     const string HighTargetKey = "HighTarget";
+    const string LastLevelKey = "LastLevel";
 
     int score;
     int currentLevel;
@@ -122,33 +126,42 @@ public class ScoreManager : MonoBehaviour
             PlayerPrefs.Save();
         }
 
+        // save last completed level / progress
+        PlayerPrefs.SetInt(LastLevelKey, currentLevel);
+        PlayerPrefs.Save();
+
         if (gameUI != null) gameUI.SetActive(false);
         if (gameOverUI != null) gameOverUI.SetActive(true);
         if (stopTimeOnGameOver) Time.timeScale = 0f;
     }
 
+    // Called by Game Over -> Next Level button
     public void NextLevel()
     {
         currentLevel++;
         SetTargetForLevel(currentLevel);
         ResetScore();
 
+        // save progress (player now advanced to this level)
+        PlayerPrefs.SetInt(LastLevelKey, currentLevel);
+        PlayerPrefs.Save();
+
         if (gameOverUI != null) gameOverUI.SetActive(false);
         if (gameUI != null) gameUI.SetActive(true);
         Time.timeScale = 1f;
     }
 
+    // Called by Game Over / Pause -> Main Menu button
     public void BackToMainMenu()
     {
         currentLevel = 0;
         SetTargetForLevel(currentLevel);
         ResetScore();
 
-        var menu = Object.FindFirstObjectByType<MenuManger>();
-        if (menu != null)
+        if (menuManger != null)
         {
-            menu.ShowTitleMenu();
-            menu.UpdateHighScoreDisplay();
+            menuManger.ShowTitleMenu();
+            menuManger.UpdateHighScoreDisplay();
         }
 
         if (gameOverUI != null) gameOverUI.SetActive(false);
@@ -156,6 +169,7 @@ public class ScoreManager : MonoBehaviour
         Time.timeScale = 1f;
     }
 
+    // Quit application (works in build; stops play mode in editor)
     public void QuitGame()
     {
 #if UNITY_EDITOR
@@ -165,6 +179,7 @@ public class ScoreManager : MonoBehaviour
 #endif
     }
 
+    // Restart a run at the specified level (resets score to start-of-level)
     public void RestartRun(int level = 0)
     {
         currentLevel = Mathf.Max(0, level);
@@ -182,4 +197,5 @@ public class ScoreManager : MonoBehaviour
     public int GetHighScore() => PlayerPrefs.GetInt(HighScoreKey, 0);
     public int GetHighTarget() => PlayerPrefs.GetInt(HighTargetKey, 0);
     public int GetRemaining() => Mathf.Max(0, targetScore - score);
+    public int GetSavedLastLevel() => PlayerPrefs.GetInt(LastLevelKey, 0);
 }
