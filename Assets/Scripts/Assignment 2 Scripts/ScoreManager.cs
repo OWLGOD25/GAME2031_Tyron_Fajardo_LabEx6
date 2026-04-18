@@ -18,7 +18,10 @@ public class ScoreManager : MonoBehaviour
     public TextMeshProUGUI targetText;
     public TextMeshProUGUI remainingText; // shows remaining for current level
     public TextMeshProUGUI levelText;
-    public TextMeshProUGUI livesText;     // NEW: shows current lives
+    public TextMeshProUGUI livesText;     // shows current lives
+
+    [Header("Game Over UI")]
+    public GameObject nextLevelButton;    // assign Next Level button object in inspector (will be hidden when game over by lives)
 
     [Header("Falling object / Spawner tuning")]
     public float baseFallLifetime = 5f;             // base destroy delay for landed objects
@@ -49,6 +52,9 @@ public class ScoreManager : MonoBehaviour
     int currentLevel;
     int targetScore;
     int currentLives;
+
+    // flag to indicate why the game ended: true == ended because lives ran out
+    bool gameOverByLives;
 
     void Awake()
     {
@@ -122,6 +128,9 @@ public class ScoreManager : MonoBehaviour
     // Called when player collects/earns points
     public void AddScore(int amount)
     {
+        // mark that this potential game over (if triggered) is from level completion
+        gameOverByLives = false;
+
         levelScore += amount;
         totalScore += amount;
         UpdateScoreUI();
@@ -171,6 +180,10 @@ public class ScoreManager : MonoBehaviour
         PlayerPrefs.SetInt(LastLevelKey, currentLevel);
         PlayerPrefs.Save();
 
+        // hide or show Next Level depending on why the game ended
+        if (nextLevelButton != null)
+            nextLevelButton.SetActive(!gameOverByLives);
+
         if (gameUI != null) gameUI.SetActive(false);
         if (gameOverUI != null) gameOverUI.SetActive(true);
         if (stopTimeOnGameOver) Time.timeScale = 0f;
@@ -179,6 +192,9 @@ public class ScoreManager : MonoBehaviour
     // Called by Game Over -> Next Level button
     public void NextLevel()
     {
+        // ensure flag cleared when advancing
+        gameOverByLives = false;
+
         currentLevel++;
         SetTargetForLevel(currentLevel);
 
@@ -204,6 +220,7 @@ public class ScoreManager : MonoBehaviour
         if (gameOverUI != null) gameOverUI.SetActive(false);
         if (gameUI != null) gameUI.SetActive(true);
         Time.timeScale = 1f;
+        UpdateScoreUI();
     }
 
     // Called by Game Over / Pause -> Main Menu button
@@ -266,6 +283,8 @@ public class ScoreManager : MonoBehaviour
 
         if (currentLives <= 0)
         {
+            // mark that this game over was caused by lives running out
+            gameOverByLives = true;
             // treat running out of lives as game over
             TriggerGameOver();
         }
