@@ -40,6 +40,9 @@ public class MenuManger : MonoBehaviour
 
     void StartGame()
     {
+        // Ensure time is running (in case Game Over paused it)
+        Time.timeScale = 1f;
+
         if (titleMenuUI != null) titleMenuUI.SetActive(false);
         if (gameUI != null) gameUI.SetActive(true);
     }
@@ -70,7 +73,7 @@ public class MenuManger : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag(playerTag);
         if (player == null) return;
 
-        // Prefer a PlayerNameDisplay component (see companion script)
+        // Prefer a DisplayHelper component
         var nameComp = player.GetComponent<DisplayHelper>();
         if (nameComp != null)
         {
