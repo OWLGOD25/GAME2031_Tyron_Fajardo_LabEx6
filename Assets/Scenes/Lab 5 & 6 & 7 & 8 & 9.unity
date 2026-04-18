@@ -740,6 +740,7 @@ GameObject:
   - component: {fileID: 262699209}
   - component: {fileID: 262699208}
   - component: {fileID: 262699211}
+  - component: {fileID: 262699212}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -875,6 +876,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player2
   moveAmount: 1
+--- !u!50 &262699212
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 262699206}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 0.0001
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!4 &263220798 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3690291930490601611, guid: c509353665daa4a449581bf86e725d10, type: 3}
@@ -6153,6 +6181,7 @@ MonoBehaviour:
   remainingText: {fileID: 1030764065}
   levelText: {fileID: 1958374497}
   livesText: {fileID: 575225827}
+  nextLevelButton: {fileID: 179282324}
   baseFallLifetime: 5
   lifetimeDecreasePerLevel: 0.3
   minFallLifetime: 1
@@ -6894,8 +6923,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1
