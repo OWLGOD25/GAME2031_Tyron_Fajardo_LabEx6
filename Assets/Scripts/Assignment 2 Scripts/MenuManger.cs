@@ -14,7 +14,7 @@ public class MenuManger : MonoBehaviour
     public Button confirmButton;
     public Button continueButton; // continue from last progress
     public TextMeshProUGUI highScoreText; // best player score (A)
-    public TextMeshProUGUI highLevelText; // NEW: displays highest level reached
+    public TextMeshProUGUI highLevelText; // displays highest level reached
 
     [Header("Player Link")]
     public string playerTag = "Player";
@@ -54,8 +54,9 @@ public class MenuManger : MonoBehaviour
         if (titleMenuUI != null) titleMenuUI.SetActive(false);
         if (gameUI != null) gameUI.SetActive(true);
 
+        // start a fresh run from title -> reset total score
         if (ScoreManager.Instance != null)
-            ScoreManager.Instance.RestartRun(0);
+            ScoreManager.Instance.RestartRun(0, true);
     }
 
     public void ConfirmName()
@@ -99,7 +100,7 @@ public class MenuManger : MonoBehaviour
     {
         int lastLevel = PlayerPrefs.GetInt(LastLevelKey, 0);
         if (ScoreManager.Instance != null)
-            ScoreManager.Instance.RestartRun(lastLevel);
+            ScoreManager.Instance.RestartRun(lastLevel, false); // do not reset total score
 
         // apply saved name to HUD/player if present
         string saved = PlayerPrefs.GetString(PlayerNameKey, "");
@@ -114,13 +115,17 @@ public class MenuManger : MonoBehaviour
     // Pause controls
     public void PauseGame()
     {
+        // hide gameplay UI and show pause menu
+        if (gameUI != null) gameUI.SetActive(false);
         if (pauseMenuUI != null) pauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
     }
 
     public void ResumeGame()
     {
+        // hide pause UI and restore gameplay UI
         if (pauseMenuUI != null) pauseMenuUI.SetActive(false);
+        if (gameUI != null) gameUI.SetActive(true);
         Time.timeScale = 1f;
     }
 

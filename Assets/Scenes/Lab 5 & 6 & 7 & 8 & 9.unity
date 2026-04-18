@@ -2395,8 +2395,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -594, y: 13.83}
-  m_SizeDelta: {x: 254.07, y: 43.23}
+  m_AnchoredPosition: {x: -627.43, y: 13.83}
+  m_SizeDelta: {x: 276.36, y: 43.23}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &688093465
 MonoBehaviour:
@@ -4948,8 +4948,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -594, y: -147}
-  m_SizeDelta: {x: 254.07, y: 43.23}
+  m_AnchoredPosition: {x: -630.77, y: -147}
+  m_SizeDelta: {x: 278.59, y: 43.23}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1203504735
 MonoBehaviour:
@@ -6150,7 +6150,7 @@ MonoBehaviour:
   confirmButton: {fileID: 1493270691}
   continueButton: {fileID: 1119706060}
   highScoreText: {fileID: 688093465}
-  highTargetText: {fileID: 1203504735}
+  highLevelText: {fileID: 1203504735}
   playerTag: Player
   hudNameText: {fileID: 2063405684}
 --- !u!1 &1848264658
