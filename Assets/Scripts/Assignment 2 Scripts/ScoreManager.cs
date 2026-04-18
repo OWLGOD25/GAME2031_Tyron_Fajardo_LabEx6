@@ -27,7 +27,7 @@ public class ScoreManager : MonoBehaviour
     public bool stopTimeOnGameOver = true;
 
     const string HighScoreKey = "HighScore";
-    const string HighTargetKey = "HighTarget";
+    const string HighLevelKey = "HighLevel";
     const string LastLevelKey = "LastLevel";
 
     int score;
@@ -118,11 +118,11 @@ public class ScoreManager : MonoBehaviour
             PlayerPrefs.Save();
         }
 
-        // update highest target reached (largest targetScore seen)
-        int highTarget = PlayerPrefs.GetInt(HighTargetKey, 0);
-        if (targetScore > highTarget)
+        // update highest level reached (largest level index seen)
+        int highLevel = PlayerPrefs.GetInt(HighLevelKey, 0);
+        if (currentLevel > highLevel)
         {
-            PlayerPrefs.SetInt(HighTargetKey, targetScore);
+            PlayerPrefs.SetInt(HighLevelKey, currentLevel);
             PlayerPrefs.Save();
         }
 
@@ -141,6 +141,14 @@ public class ScoreManager : MonoBehaviour
         currentLevel++;
         SetTargetForLevel(currentLevel);
         ResetScore();
+
+        // update highest level when advancing
+        int highLevel = PlayerPrefs.GetInt(HighLevelKey, 0);
+        if (currentLevel > highLevel)
+        {
+            PlayerPrefs.SetInt(HighLevelKey, currentLevel);
+            PlayerPrefs.Save();
+        }
 
         // save progress (player now advanced to this level)
         PlayerPrefs.SetInt(LastLevelKey, currentLevel);
@@ -195,7 +203,7 @@ public class ScoreManager : MonoBehaviour
     public int GetTarget() => targetScore;
     public int GetCurrentLevel() => currentLevel;
     public int GetHighScore() => PlayerPrefs.GetInt(HighScoreKey, 0);
-    public int GetHighTarget() => PlayerPrefs.GetInt(HighTargetKey, 0);
+    public int GetHighLevel() => PlayerPrefs.GetInt(HighLevelKey, 0);
     public int GetRemaining() => Mathf.Max(0, targetScore - score);
     public int GetSavedLastLevel() => PlayerPrefs.GetInt(LastLevelKey, 0);
 }

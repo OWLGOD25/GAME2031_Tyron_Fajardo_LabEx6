@@ -7,14 +7,14 @@ public class MenuManger : MonoBehaviour
     [Header("UI Panels")]
     public GameObject titleMenuUI;
     public GameObject gameUI;
-    public GameObject pauseMenuUI; // NEW: pause menu panel
+    public GameObject pauseMenuUI; // pause menu panel
 
     [Header("Title Menu Controls")]
     public TMP_InputField nameInput;
     public Button confirmButton;
-    public Button continueButton; // NEW: continue from last progress
-    public TextMeshProUGUI highScoreText;
-    public TextMeshProUGUI highTargetText;
+    public Button continueButton; // continue from last progress
+    public TextMeshProUGUI highScoreText; // best player score (A)
+    public TextMeshProUGUI highLevelText; // NEW: displays highest level reached
 
     [Header("Player Link")]
     public string playerTag = "Player";
@@ -111,7 +111,7 @@ public class MenuManger : MonoBehaviour
         if (gameUI != null) gameUI.SetActive(true);
     }
 
-    // Pause controls (wire Pause button to call this)
+    // Pause controls
     public void PauseGame()
     {
         if (pauseMenuUI != null) pauseMenuUI.SetActive(true);
@@ -128,22 +128,22 @@ public class MenuManger : MonoBehaviour
     public void UpdateHighScoreDisplay()
     {
         int highScore = 0;
-        int highTarget = 0;
+        int highLevel = 0;
         if (ScoreManager.Instance != null)
         {
             highScore = ScoreManager.Instance.GetHighScore();
-            highTarget = ScoreManager.Instance.GetHighTarget();
+            highLevel = ScoreManager.Instance.GetHighLevel();
         }
         else
         {
             highScore = PlayerPrefs.GetInt("HighScore", 0);
-            highTarget = PlayerPrefs.GetInt("HighTarget", 0);
+            highLevel = PlayerPrefs.GetInt("HighLevel", 0);
         }
 
         if (highScoreText != null)
             highScoreText.text = $"High Score: {highScore}";
 
-        if (highTargetText != null)
-            highTargetText.text = $"Highest Target: {highTarget}";
+        if (highLevelText != null)
+            highLevelText.text = $"Highest Level: {highLevel}";
     }
 }
