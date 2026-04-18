@@ -11,6 +11,7 @@ public class MenuManger : MonoBehaviour
     [Header("Title Menu Controls")]
     public TMP_InputField nameInput;
     public Button confirmButton;
+    public TextMeshProUGUI highScoreText; // show high score on title
 
     [Header("Player Link")]
     public string playerTag = "Player"; // tag to find player GameObject
@@ -30,9 +31,12 @@ public class MenuManger : MonoBehaviour
 
         if (confirmButton != null)
             confirmButton.onClick.AddListener(ConfirmName);
+
+        UpdateHighScoreDisplay();
     }
 
-    void ShowTitleMenu()
+    // made public so ScoreManager can call it
+    public void ShowTitleMenu()
     {
         if (titleMenuUI != null) titleMenuUI.SetActive(true);
         if (gameUI != null) gameUI.SetActive(false);
@@ -45,6 +49,10 @@ public class MenuManger : MonoBehaviour
 
         if (titleMenuUI != null) titleMenuUI.SetActive(false);
         if (gameUI != null) gameUI.SetActive(true);
+
+        // Ensure ScoreManager restarts the run at level 0 when starting from title
+        if (ScoreManager.Instance != null)
+            ScoreManager.Instance.RestartRun(0);
     }
 
     public void ConfirmName()
@@ -85,5 +93,18 @@ public class MenuManger : MonoBehaviour
         var childText = player.GetComponentInChildren<TextMeshProUGUI>();
         if (childText != null)
             childText.text = name;
+    }
+
+    // Update title high score text (called from Start and when returning to menu)
+    public void UpdateHighScoreDisplay()
+    {
+        int high = 0;
+        if (ScoreManager.Instance != null)
+            high = ScoreManager.Instance.GetHighScore();
+        else
+            high = PlayerPrefs.GetInt("HighScore", 0);
+
+        if (highScoreText != null)
+            highScoreText.text = $"High Score: {high}";
     }
 }
